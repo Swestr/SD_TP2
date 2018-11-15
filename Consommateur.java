@@ -7,29 +7,42 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.NullPointerException;
 
 public class Consommateur extends Client {
   private ArrayList<String> messages;
+  private final int nbLect;
 
-  public Consommateur(int id, InetAddress address, int port){
+  public Consommateur(int id, InetAddress address, int port, int nbLect){
     super(id, address, port);
+    messages = new ArrayList<String>();
+    this.nbLect = nbLect;
   }
 
   @Override
   public void run(){
     try{
-      connect();
-      while(true){
+      for (int i = 0; i < nbLect; i++) {
+        connect();
         out.println("CONSOMMATEUR");
         out.flush();
+        out.println(id);
+        out.flush();
 
-        messages.add(in.readLine());
+        String msg = null;
 
-        System.out.println(messages);
+        //Il faut attendre que le consommateur ait lu une valeur
+        while(msg == null){
+          msg = in.readLine();
+          Thread.sleep(100);
+        }
+
+        messages.add(msg);
+
+        deconnect();
       }
-      // deconnect();
     }
-    catch(IOException e){
+    catch(Exception e){
       e.printStackTrace();
       System.exit(0);
     }

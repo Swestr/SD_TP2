@@ -11,20 +11,17 @@ public class Producteur extends Client {
   private String[] messages;
   private int nbMsg;
 
-  private void generateMsg(){
-    //On envoi entre 1 et 10 messages
-    // nbMsg = (int)(Math.random() * 10)+1;
-    nbMsg = 1;
-    messages = new String[nbMsg];
-    for (int i = 0; i < nbMsg ; i++) {
-      messages[i] = i + "ème message du Producteur "+id;
-    }
+  public Producteur(int id, InetAddress address, int port, int nbMsg){
+    super(id, address, port);
+    this.nbMsg = nbMsg;
+    generateMsg();
   }
 
-
-  public Producteur(int id, InetAddress address, int port){
-    super(id, address, port);
-    generateMsg();
+  private void generateMsg(){
+    messages = new String[nbMsg];
+    for (int i = 0; i < nbMsg ; i++) {
+      messages[i] = (i+1) + "ème message du Producteur "+id;
+    }
   }
 
   @Override
@@ -36,16 +33,20 @@ public class Producteur extends Client {
         out.println("PRODUCTEUR");
         out.flush();
 
+        out.println(id);
+        out.flush();
+
         out.println(messages[i]);
         out.flush();
 
-        // String end  = ;
-        System.out.println(in.readLine());
+        while(in.readLine() == null){
+          Thread.sleep(100);
+        }
 
         deconnect();
       }
     }
-    catch(IOException e){
+    catch(Exception e){
       e.printStackTrace();
       System.exit(0);
     }

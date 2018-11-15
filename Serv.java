@@ -45,39 +45,45 @@ public class Serv extends Thread{
    return elm;
  }
 
- private synchronized void producerAction(String msg) throws InterruptedException{
+ private synchronized void producerAction(String id, String msg) throws InterruptedException{
    boolean success = addElement(msg);
    while(!success){
      Thread.sleep(100);
      success = addElement(msg);
    }
+   System.out.println("Le producteur " + id + " a envoyé le message : \n\t\"" + msg + "\"\tTaille du buffer : " + getSize());
  }
 
-private synchronized void consumerAction() throws InterruptedException{
+private synchronized String consumerAction(String id) throws InterruptedException{
   boolean success = getSize() != 0 ? true : false;
-  System.out.println(success);
   while(!success){
     Thread.sleep(100);
-    success = getSize() != 0 ? false : true;
+    success = getSize() != 0 ? true : false;
   }
-  out.println(delElement());
+  String elm = delElement();
+  System.out.println("Le consommateur " + id + " a lu le message : \n\t\"" + elm + "\"\tTaille du buffer : " + getSize());
+  return elm;
 }
 
  public void run(){
    try{
      if(role.equals("PRODUCTEUR")){
-       System.out.println("PRODUTEUR");
+       String id = in.readLine();
        String message = in.readLine();
-       producerAction(message);
-       Thread.sleep(10000);
-
+       producerAction(id, message);
        out.println("SUCCESS");
-       // System.out.println("FIN PRODUTEUR : " + buffer.toString());
+       out.flush();
      }
+
      if(role.equals("CONSOMMATEUR")){
-       System.out.println("CONSOMMATEUR : "+buffer.toString());
-       consumerAction();
-       System.out.println("FIN CONSOMMATEUR : " + buffer.toString());
+       String id = in.readLine();
+       // Thread.sleep((int)(Math.random()*4000 +1000));
+       String message = consumerAction(id);
+
+
+       out.println(message);
+       out.flush();
+
      }
 
      socket.close();

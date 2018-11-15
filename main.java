@@ -5,7 +5,7 @@ import java.net.UnknownHostException;
 public class main {
   public static void main(String[] args) {
     final int port = 8080;
-    final int bufferSize = 10;
+    final int bufferSize = 2;
     InetAddress address =null;
 
     try{
@@ -25,20 +25,22 @@ public class main {
       e.printStackTrace();
     }
 
-    Producteur producer = new Producteur(0, address, port);
-    producer.start();
-    // Producteur producer1 = new Producteur(1, address, port);
-    // producer1.start();
+    // int max = 10;
+    int max = (int) (Math.random() * 10 + 1);
 
-    try{
-      Thread.sleep(1000);
-    }
-    catch(InterruptedException e){
-      e.printStackTrace();
+    for (int i = 0; i < max; i++) {
+      // int nbLec = 3;
+      // int nbEcr = 2;
+      int nbLec = (int) (Math.random() * 10 + 1);
+      int nbEcr = (int) (Math.random() * 10 + 1);
+
+      Producteur producer = new Producteur(i, address, port, nbEcr);
+      producer.start();
+
+      Consommateur consumer = new Consommateur(i, address, port, nbLec);
+      consumer.start();
     }
 
-    Consommateur consumer = new Consommateur(1, address, port);
-    consumer.start();
 
   }
 }
