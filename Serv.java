@@ -14,71 +14,37 @@ public class Serv extends Thread{
   private Socket socket;
   private PrintWriter out;
   private BufferedReader in;
-  public Serv(ArrayList<String> buffer, int maxSize, String role, Socket socket, PrintWriter out, BufferedReader in){
+  private Synchronizer consSync;
+  private Synchronizer prodSync;
+  public Serv(ArrayList<String> buffer, int maxSize, String role, Socket socket, PrintWriter out, BufferedReader in, Synchronizer prodSync, Synchronizer consSync){
     this.buffer = buffer;
     this.maxSize = maxSize;
     this.role = role;
     this.socket = socket;
     this.out = out;
     this.in = in;
+    this.consSync = consSync;
+    this.prodSync = prodSync;
   }
-
-  public synchronized int getSize(){
-      return this.buffer.size();
-  }
-
-  public int getMaxSize(){
-      return this.maxSize;
-  }
-
-  private synchronized boolean addElement(String s){
-    if(getSize() < maxSize){
-      this.buffer.add(s);
-      return true;
-    }
-    return false;
- }
-
- private synchronized String delElement(){
-   String elm = buffer.get(0);
-   buffer.remove(0);
-   return elm;
- }
-
- private synchronized void producerAction(String id, String msg) throws InterruptedException{
-   boolean success = addElement(msg);
-   while(!success){
-     Thread.sleep(100);
-     success = addElement(msg);
-   }
-   System.out.println("Le producteur " + id + " a envoyé le message : \n\t\"" + msg + "\"\tTaille du buffer : " + getSize());
- }
-
-private synchronized String consumerAction(String id) throws InterruptedException{
-  boolean success = getSize() != 0 ? true : false;
-  while(!success){
-    Thread.sleep(100);
-    success = getSize() != 0 ? true : false;
-  }
-  String elm = delElement();
-  System.out.println("Le consommateur " + id + " a lu le message : \n\t\"" + elm + "\"\tTaille du buffer : " + getSize());
-  return elm;
-}
 
  public void run(){
    try{
      if(role.equals("PRODUCTEUR")){
+       // System.out.println("PRODUCTEUR");
        String id = in.readLine();
        String message = in.readLine();
-       producerAction(id, message);
+       prodSync.producerAction(id, message);
        out.println("SUCCESS");
        out.flush();
+       // System.out.println("FIN PRODUCTEUR");
      }
 
      if(role.equals("CONSOMMATEUR")){
        String id = in.readLine();
        // Thread.sleep((int)(Math.random()*4000 +1000));
-       String message = consumerAction(id);
+       // System.out.println("CONSOMMATEUR");
+       String message = consSync.consumerAction(id);
+       // System.out.println("FIN CONSOMMATEUR");
 
 
        out.println(message);

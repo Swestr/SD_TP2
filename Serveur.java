@@ -10,12 +10,12 @@ import java.io.InputStreamReader;
 abstract class Serveur extends Thread{
   protected ServerSocket serverSocket;
   protected Socket socket;
-	protected PrintWriter out;
-	protected BufferedReader in;
+  protected PrintWriter out;
+  protected BufferedReader in;
   protected int port;
 
   protected Serveur(int port){
-      this.port = port;
+    this.port = port;
   }
 
   protected void nextConnection() throws IOException{

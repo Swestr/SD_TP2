@@ -15,7 +15,9 @@ public class main {
       e.printStackTrace();
     }
 
-    Tampon buffer = new Tampon(bufferSize, port);
+    Synchronizer prodSync = new Synchronizer();
+    Synchronizer consSync = new Synchronizer();
+    Tampon buffer = new Tampon(bufferSize, port, prodSync, consSync);
     buffer.start();
 
     try{
@@ -25,11 +27,12 @@ public class main {
       e.printStackTrace();
     }
 
-    // int max = 10;
+
+    // int max = 2;
     int max = (int) (Math.random() * 10 + 1);
 
     for (int i = 0; i < max; i++) {
-      // int nbLec = 3;
+      // int nbLec = 2;
       // int nbEcr = 2;
       int nbLec = (int) (Math.random() * 10 + 1);
       int nbEcr = (int) (Math.random() * 10 + 1);
@@ -40,7 +43,5 @@ public class main {
       Consommateur consumer = new Consommateur(i, address, port, nbLec);
       consumer.start();
     }
-
-
   }
 }

@@ -29,5 +29,4 @@ abstract class Client extends Thread{
   protected void deconnect() throws IOException{
     socket.close();
   }
-
 }
