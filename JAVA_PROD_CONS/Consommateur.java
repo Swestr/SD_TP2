@@ -39,6 +39,7 @@ public class Consommateur extends Client {
 
         messages.add(msg);
 
+
         deconnect();
       }
     }
