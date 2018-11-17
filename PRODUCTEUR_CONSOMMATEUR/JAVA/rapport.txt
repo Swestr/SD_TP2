@@ -1,0 +1,83 @@
+Fichier main.java :
+  Défini le port de connection, ainsi que l'adresse ip locale et la taille du buffer.
+  Crée et exécue le serveur (classe Tampon), puis, une fois celui-ci crée,
+  crée n producteurs et consommateurs (0 < n <= 10).
+  Chacun des producteurs et consommateurs sont créés avec n messages à produire/consommer (0 < n <= 10).
+
+---------
+
+Fichier Client.java :
+  La classe Client (un Thread), elle a pour attributs :
+  - un id représentant l'id du client
+  - un port
+  - l'adresse du serveur
+  - un Socket représentant la connexion avec le serveur
+  - un PrintWriter qui reçoit les messages envoyés par le serveur
+  - un BufferReader qui envoie les messages au serveur
+  Cette classe gère la connexion entre le client et le serveur.
+  Une fonction connect() connecte le client au serveur (grâce à l'adresse et au port).
+  Une fonction deconnect() s'y déconnecte.
+
+Fichier Producteur.java :
+  La classe Producteur, hérite de la classe Client. Elle a pour attribut :
+  - une liste de messages à envoyer
+  - un nombre de messages à envoyer
+  Cette classe envoie n messages au serveur (si possible). Pour cela, elle génère des messages, puis,
+  pour chaque message à envoyer,
+  elle se connecte au serveur, lui envoie son role ("PRODUCTEUR"), son id, puis le message à produire.
+  Elle attend la reception d'un message envoyé par le serveur (message de fin d'exécution).
+  Pour finir, elle se déconnecte.
+
+
+Fichier Consommateur.java :
+
+  La classe Consommateur, hérite de la classe Client. Elle a pour attribut :
+  - une liste de messages consommés
+  - un nombre de lecture défini
+  Cette classe reçoit n messages du serveur (si possible). Pour cela, pour chacun des messages à recevoir,
+  elle se connecte au serveur, lui envoie son role ("CONSOMMATEUR"), puis son id et attends la
+  reception d'un message envoyé par le serveur (le message consommé).
+  Pour finir, elle se déconnecte.
+
+---------------
+
+Fichier Serveur.java :
+  La classe Serveur (un Thread), elle a pour attributs :
+    - un port
+    - un ServerSocket initialisé avec le port
+    - un Socket représentant la connexion avec un client
+    - un PrintWriter qui reçoit les messages envoyés par le client
+    - un BufferReader qui envoie les messages au client
+
+  Cette classe gère les connexions entre un serveur et une autre machine.
+  Un fonction nextConnection() est utilisée pour créer une nouvelle connexion.
+
+Fichier Synchronizer.java :
+  La classe Synchronizer, qui contient une ArrayList<String> représentant le buffer ainsi que sa taille.
+  Cette classe contient deux fonction principales :
+    - producerAction(String id, String msg) qui, s'il y a de l'espace dans le buffer,
+    ajoute le message, sinon attend.
+    - consumerAction(String id) qui, s'il y a un message dans le buffer, le lit (en mode FIFO), sinon attend.
+  Chacune de ces fonctions possède le mot clé "synchronized". De ce fait, pour une instance de Synchronizer donnée,
+  aucune de ces fonctions ne peut être appellés en même temps par deux processus.
+
+
+Fichier Tampon.java :
+  La classe Tampon, elle hérite de la classe Serveur. Elle a comme autre attributs :
+    - une ArrayList<String> représentant le buffer
+    - la taille maximale du buffer
+    - un Synchronizer pour les processus Consommateurs initialisé avec le buffer et sa taille
+    - un Synchronizer pour les processus Producteurs initialisé avec le buffer et sa taille
+
+  Une fois le tampon exécuté, a chaque fois qu'un client veut se connecter au serveur,
+  le serveur reçoit le rôle du client (consommateur ou producteur) et un nouveau Thread
+  de type Serv sera créé et exécuter. Chaque attribut de la classe Tampon (et donc Serveur) est envoyé à l'instance de Serv créée.
+
+Fichier Serv.java :
+  La classe Serv (un Thread), elle a les attributs envoyés par Tampon.
+  Si le rôle du client est producteur, le thread lit l'id envoyé par le client, puis son message.
+  Elle exécute alors la fonction consumerAction() sur prodSync (le Synchronizer des consommateurs),
+  puis, une fois l'action terminée, renvois un message au client pour avertir de la fin d'exécution.
+  Si son rôle est consommateur, il lit l'id envoyé par le client, exécute la fonction consumerAction
+  sur consSync (le Synchronizer des consommateurs), puis envoie le message lu au client.
+  A la fin d'éxecution, le socket est fermé.
