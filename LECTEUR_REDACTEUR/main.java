@@ -28,6 +28,13 @@ public class main {
     Lecteur lec = new Lecteur(0,address, port, filename );
     lec.start();
 
+    try{
+      Thread.sleep(100);
+    }
+    catch(InterruptedException e){
+      e.printStackTrace();
+    }
+
     Redacteur red = new Redacteur(1, address, port, filename, "5");
     red.start();
 

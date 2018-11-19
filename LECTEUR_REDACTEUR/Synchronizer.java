@@ -23,7 +23,9 @@ public class Synchronizer{
     String res = "";
     try{
       Runtime run = Runtime.getRuntime();
-      Process pr = run.exec("cat "+filename);
+      Process pr = run.exec("./create.sh");
+      pr.waitFor();
+      pr = run.exec("cat Echanges/"+filename);
       pr.waitFor();
       BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
       String line = "";
@@ -40,7 +42,7 @@ public class Synchronizer{
 
   public String writeFile(String filename, String fileContent){
     try {
-          Files.write(Paths.get(filename), fileContent.getBytes());
+          Files.write(Paths.get("Echanges/" + filename), fileContent.getBytes());
     } catch (IOException e) {
           e.printStackTrace();
     }

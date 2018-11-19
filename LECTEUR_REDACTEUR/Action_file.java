@@ -10,14 +10,36 @@ import java.io.InputStreamReader;
 
 public class Action_file extends Thread{
   private File_attente file;
+  private String filename;
   private Synchronizer redSync;
   private Synchronizer lecSync;
-  public Action_file(File_attente file, Synchronizer lecSync, Synchronizer redSync){
-      this.file = file;
-      this.redSync = redSync;
-      this.lecSync = lecSync;
+  public Action_file(String filename){
+      this.file = new File_attente();
+      redSync = new Synchronizer();
+      lecSync = new Synchronizer();
+      redSync.setAttente(file);
+      lecSync.setAttente(file);
+      this.filename = filename;
   }
 
+public File_attente getFile(){
+  return this.file;
+}
+
+  public Synchronizer getRedSync(){
+    return redSync;
+  }
+  public Synchronizer getLecSync(){
+    return lecSync;
+  }
+
+  public String getFilename(){
+    return filename;
+  }
+
+  public int getSize(){
+    return file.getSize();
+  }
  public void run(){
    try{
      while(true){
